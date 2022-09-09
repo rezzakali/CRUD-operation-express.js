@@ -3,6 +3,36 @@ const Todo = require("../schemas/todoSchema");
 
 const router = express.Router();
 
+// active status todos
+router.get("/active", async (req, res) => {
+  try {
+    const todo = new Todo();
+    const data = await todo.findActive();
+    res.status(200).json({ result: data });
+  } catch (err) {
+    res.status(500).json({ error: "There was a server side error!" });
+  }
+});
+
+// find by js word
+router.get("/js", async (req, res) => {
+  try {
+    const data = await Todo.findByJS();
+    res.status(200).json({ result: data });
+  } catch (error) {
+    res.status(500).json({ error: "There was a server side error!" });
+  }
+});
+// find by language
+router.get("/language", async (req, res) => {
+  try {
+    const data = await Todo.find().byLanguage("html");
+    res.status(200).json({ result: data });
+  } catch (error) {
+    res.status(500).json({ error: "There was a server side error!" });
+  }
+});
+
 // get all the todos
 router.get("/", (req, res) => {
   Todo.find({ status: "active" })

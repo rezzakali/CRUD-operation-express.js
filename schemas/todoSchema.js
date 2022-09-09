@@ -16,6 +16,26 @@ const todoSchema = mongoose.Schema({
   },
 });
 
+// instance methods
+todoSchema.methods = {
+  findActive() {
+    return mongoose.model("Todo").find({ status: "active" });
+  },
+};
+
+// statics
+todoSchema.statics = {
+  findByJS() {
+    return this.find({ title: /js/i });
+  },
+};
+
+// query helpers
+todoSchema.query = {
+  byLanguage(language) {
+    return this.find({ title: new RegExp(language, "i") });
+  },
+};
 // model
 const Todo = mongoose.model("Todo", todoSchema);
 
