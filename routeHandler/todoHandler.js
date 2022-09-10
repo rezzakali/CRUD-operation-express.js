@@ -1,4 +1,5 @@
 const express = require("express");
+const checkLogin = require("../middleware/checkLogin");
 const Todo = require("../schemas/todoSchema");
 
 const router = express.Router();
@@ -34,7 +35,7 @@ router.get("/language", async (req, res) => {
 });
 
 // get all the todos
-router.get("/", (req, res) => {
+router.get("/", checkLogin, (req, res) => {
   Todo.find({ status: "active" })
     .select({
       _id: 0,
