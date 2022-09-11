@@ -1,6 +1,7 @@
 const express = require("express");
 const checkLogin = require("../middleware/checkLogin");
 const Todo = require("../schemas/todoSchema");
+const User = require("../schemas/userShema");
 
 const router = express.Router();
 
@@ -36,12 +37,14 @@ router.get("/language", async (req, res) => {
 
 // get all the todos
 router.get("/", checkLogin, (req, res) => {
-  Todo.find({ status: "active" })
+  Todo.find({})
+    .populate("user", "name username -_id")
     .select({
       _id: 0,
       __v: 0,
       //   date: 0,
     })
+    .limit(2)
     .exec((err, data) => {
       if (err) {
         res.status(500).json({
@@ -78,7 +81,18 @@ router.post("/", checkLogin, async (req, res) => {
     user: req.userId,
   });
   try {
-    await newTodo.save();
+    const todo = await newTodo.save();
+    await User.updateOne(
+      {
+        _id: req.userId,
+      },
+      {
+        $push: {
+          todos: todo._id,
+        },
+      }
+    );
+
     res.status(200).json({ result: "Todo inserted successfully!" });
   } catch (error) {
     res.status(500).json({ error: "There was a server side error!" });
